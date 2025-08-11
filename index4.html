@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+  <title>LCA Visual Studios</title>
+  <meta name="description" content="Photography portfolio for LCA"/>
+  <meta name="theme-color" content="#0a0a0a"/>
+
+  <!-- ====== Styles ====== -->
+  <style>
+    :root{
+      /* --- Black & Gold theme --- */
+      --bg:#0a0a0a;              /* page background */
+      --panel:#0f0f10;           /* cards / surfaces */
+      --ink:#141416;             /* inputs */
+      --text:#f7f5ee;            /* warm off-white */
+      --muted:#c8c1a6;           /* muted text (warm) */
+       --hero-h: 340px;   /* same min-height for both tiles on desktop */
+      /* golds */
+      --gold-1:#f4d88b;          /* light gold */
+      --gold-2:#d4af37;          /* classic gold */
+      --gold-3:#a47e1b;          /* deep gold/bronze */
+
+      --brand:var(--gold-2);
+      --accent:var(--gold-1);
+
+      --radius: 18px;
+      --shadow: 0 12px 40px rgba(0,0,0,.5);
+      --ring: 0 0 0 3px rgba(212,175,55,.35);
+      --border: 1px solid rgba(212,175,55,.18);
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;padding:0;background:var(--bg);color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    a{color:inherit;text-decoration:none}
+    img{display:block;max-width:100%;height:auto;border-radius:14px}
+    .container{width:min(1200px,92vw);margin-inline:auto}
+
+    /* ====== Analog texture & vignette (subtle warm leaks) ====== */
+    body::before{
+      content:"";position:fixed;inset:-20px;pointer-events:none;z-index:-2;
+      background:
+        radial-gradient(1100px 520px at 14% 10%, rgba(244,216,139,.10), transparent 60%),
+        radial-gradient(900px 460px at 86% 18%, rgba(212,175,55,.10), transparent 58%),
+        radial-gradient(620px 360px at 18% 80%, rgba(164,126,27,.08), transparent 62%),
+        /* gentle scanlines and grain */
+        repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 1px, transparent 1px 2px),
+        repeating-radial-gradient(circle at 30% 40%, rgba(255,255,255,.02) 0 .5px, transparent .5px 3px),
+        repeating-radial-gradient(circle at 70% 60%, rgba(255,255,255,.02) 0 .5px, transparent .5px 3px);
+      mix-blend-mode:screen; filter:contrast(1.02) saturate(.95);
+    }
+    body::after{
+      content:"";position:fixed;inset:-60px;z-index:-3;pointer-events:none;
+      background:radial-gradient(120% 120% at 50% 50%, transparent 55%, rgba(0,0,0,.7) 100%);
+    }
+
+    /* ====== Header / Nav ====== */
+    header{position:sticky;top:0;z-index:50;background:rgba(10,10,10,.7);backdrop-filter: blur(8px);border-bottom:1px solid rgba(212,175,55,.18)}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand-logo{
+      width:40px;
+      height:40px;
+      display:block;
+      object-fit:contain;                /* keep proportions */
+      border-radius:10px;                /* keeps the same rounded look */
+      background:transparent;            /* remove the gradient square */
+      box-shadow:0 6px 18px rgba(212,175,55,.25), inset 0 0 0 1px rgba(0,0,0,.25);
+      padding:4px;                       /* subtle “badge” frame around the logo */
+      border:1px solid rgba(212,175,55,.25);
+    }
+
+    .brand-title{font-weight:900;letter-spacing:.6px}
+    .brand-sub{font-size:12px;color:var(--muted)}
+
+    /* Desktop menu */
+    .menu{display:flex;align-items:center;gap:18px}
+    .menu a{opacity:.85;position:relative;padding:6px 2px}
+    .menu a:hover{opacity:1}
+    .menu a::after{
+      content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;
+      background:linear-gradient(90deg,transparent, var(--gold-1), transparent);
+      transform:scaleX(0);transform-origin:center;transition:transform .25s ease;
+    }
+    .menu a:hover::after{transform:scaleX(1)}
+
+    /* Hamburger */
+    .hamburger{display:none;gap:6px;flex-direction:column;cursor:pointer}
+    .hamburger span{width:26px;height:2px;background:var(--text);transition:all .2s ease}
+
+    /* Collapsible panel for small screens */
+    .mobile-panel{display:none; position: sticky; top: 0;}
+    .mobile-panel[hidden]{ display:none; }
+
+    @media (max-width: 860px){
+      .menu{display:none}
+      .hamburger{display:flex}
+      .mobile-panel{display:block;background:rgba(255,255,255,.03);border-top:1px solid rgba(212,175,55,.18)}
+      .mobile-menu{display:flex;flex-direction:column;gap:6px;padding:12px}
+      .mobile-menu a{padding:12px;border-radius:12px}
+      .mobile-menu a:hover{background:rgba(212,175,55,.08)}
+    }
+
+    /* ====== Hero ====== */
+    /* HERO GRID */
+    .hero-wrap{
+  display:grid;
+  grid-template-columns:minmax(260px,34%) 1fr;  /* logo slimmer */
+  grid-template-areas:"visual card";
+  gap:100px;
+  align-items:center;                            /* center content vertically */
+  padding-block:100px;
+}
+@media (max-width:980px){
+  .hero-wrap{
+    grid-template-areas:"card" "visual";
+    grid-template-columns:1fr;
+    gap:48px;
+    padding-block:64px;
+  }
+}
+
+.hero-visual{
+  grid-area:visual;
+  background:transparent;   /* no panel */
+  border:none;
+  box-shadow:none;
+  overflow:visible;
+  display:grid; place-items:center;
+}
+.hero-visual::before{ content:none; }  /* kill decorative overlay */
+.glide{ display:none; }                 /* remove bottom caption */
+.hero-visual img{
+  width:auto; height:auto;
+  max-width:86%; max-height:72%;
+  object-fit:contain;
+  border-radius:16px;                   /* subtle rounding only */
+  box-shadow:0 18px 55px rgba(0,0,0,.45); /* soft depth instead of borders */
+}
+
+
+
+.hero-title{
+  margin:10px 0 10px;
+  font-size:clamp(20px,3.2vw,35px);
+  line-height:2;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--gold-1),var(--gold-3));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 1px 0 rgba(0,0,0,.35);   /* gentle punch */
+}
+.tagline{
+  font-size:clamp(14px,1.6vw,17px);
+  color:var(--muted);
+  margin:0 0 40px;
+}
+/* CTA row: two equal columns with a clean gap */
+.cta{
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* equal widths */
+  gap: 16px;                       /* spacing in the middle */
+  max-width: 520px;                /* optional: keeps the row tidy */
+  margin-top: 16px;
+}
+
+/* Make each button fill its grid cell and match heights */
+.cta .btn{
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;              /* same padding so they look identical */
+  border-radius: 12px;
+}
+
+/* Optional: stack on small screens */
+@media (max-width: 520px){
+  .cta{ grid-template-columns: 1fr; }
+}
+
+.hero-badge{ 
+  display:inline-flex;align-items:center;gap:8px;padding:10px 10px;border-radius:999px;
+      background:rgba(212,175,55,.14);border:2px solid rgba(212,175,55,.35);
+      font-size:12px;color:var(--gold-1);text-shadow:0 1px 0 rgba(0,0,0,.5)
+}
+
+
+
+    /* Base button — no flex here */
+    .btn{
+      appearance:none;border:none;
+      background:linear-gradient(135deg,var(--gold-1),var(--gold-2));
+      color:#0b0b0c;padding:20px 40px;border-radius:12px;font-weight:800;cursor:pointer;box-shadow:var(--shadow);
+      transition: transform .12s ease, box-shadow .25s ease, filter .25s ease;
+      display:inline-flex; align-items:center; justify-content:center;
+    }
+
+    /* Form submit should keep natural width */
+    .submit-row .btn{ flex:0 0 auto; width:auto; }
+
+
+    .btn:hover{filter:brightness(1.06);box-shadow:0 12px 36px rgba(212,175,55,.25)}
+    .btn:active{transform:translateY(1px)}
+    .btn.outline{
+      background:transparent;color:var(--text);border:1px solid rgba(212,175,55,.45)
+    }
+    .btn.outline:hover{background:rgba(212,175,55,.08)}
+
+    .hero-visual{position:relative;min-height:360px;border-radius:var(--radius);overflow:hidden;border:var(--border)}
+    .hero-visual::before{content:"";position:absolute;inset:-10%;
+      background:
+        radial-gradient(600px 320px at 12% 18%, rgba(244,216,139,.12), transparent 60%),
+        radial-gradient(520px 260px at 88% 16%, rgba(212,175,55,.10), transparent 63%),
+        radial-gradient(420px 210px at 80% 85%, rgba(164,126,27,.10), transparent 62%);
+      animation: drift 28s ease-in-out infinite alternate;
+    }
+    @keyframes drift{from{transform:translate3d(-1%,0,0)} to{transform:translate3d(1%,1%,0)}}
+    .glide{text-transform:uppercase;letter-spacing:.2em;font-weight:800;position:absolute;inset:auto 0 18px 0;text-align:center;opacity:.25;color:var(--gold-1)}
+
+*/
+
+
+    /* ====== Sections ====== */
+    section{padding-block:72px;border-top:1px solid rgba(212,175,55,.14)}
+    section h2{font-size:clamp(22px,4vw,36px);margin:0 0 18px}
+    .sub{color:var(--muted);max-width:70ch}
+
+    /* ====== About ====== */
+    .about-section{margin-top:4px}
+    .about-section h2{margin:0 0 12px}
+    .about-desc{color:var(--muted);max-width: 100%;margin:0 0 18px}
+
+    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch}
+    @media (max-width: 860px){ .about-grid{grid-template-columns:1fr} }
+
+    .about-card{
+      background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+      border:var(--border);
+      border-radius:var(--radius);
+      padding:18px 18px 16px;
+      box-shadow:var(--shadow);
+      position:relative;
+      height:100%;
+      display:flex;                 
+      flex-direction:column;
+
+    }
+    .about-card::after{
+      content:"";position:absolute;inset:auto 10px 10px 10px;border-radius:14px;
+      background:linear-gradient(135deg,rgba(244,216,139,.18),rgba(212,175,55,.12));
+      filter:blur(18px);opacity:.45;z-index:-1
+    }
+
+    .about-card.skew-left,
+    .about-card.skew-right{
+      transform:none;                 
+    }
+
+    .bullets li::before{ content:"•"; }
+    /* Remove decorative dot bullets on HOW I WORK only */
+    .bullets.steps li { padding-left: 0; }
+    .bullets.steps li::before { content: none; }
+
+
+    .bullets{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+    .bullets li{padding-left:14px;position:relative;color:#efe9cc}
+    .bullets li::before{content:"•";position:absolute;left:0;top:0;color:var(--gold-1);opacity:.95}
+    
+
+    .steps li{display:flex;gap:10px;align-items:flex-start}
+    .steps li span{
+      display:inline-grid;place-items:center;min-width:28px;height:28px;border-radius:999px;
+      border:1px solid rgba(212,175,55,.35);font-size:12px;color:#f3e7b4;background:rgba(212,175,55,.08)
+    }
+    .about-section{margin-top:0;scroll-margin-top:96px}
+
+    /* ====== Work / Carousels ====== */
+    .category{margin-top:28px}
+    .cat-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+    .cat-title{font-weight:800;letter-spacing:.4px;color:#f3e7b4}
+    .rail{display:flex;gap:16px;overflow:auto hidden;padding:6px 2px}
+    .rail { scrollbar-color: #000 transparent; }   
+    .rail::-webkit-scrollbar{height:10px}
+    .rail::-webkit-scrollbar-thumb{
+      background:#000;
+      border-radius:999px
+    }
+    .rail::-webkit-scrollbar-track{ background:transparent }/* Keep track invisible */
+    .rail::-webkit-scrollbar-thumb:hover{ background:#111 } /* Optional: slight hover */
+    .card{
+      min-width: clamp(240px, 42vw, 360px);aspect-ratio:4/3;border-radius:18px;overflow:hidden;position:relative;
+      border:1px solid rgba(212,175,55,.16);background:#0f0f13;box-shadow:0 10px 25px rgba(0,0,0,.45);
+      transition: box-shadow .25s ease; cursor: zoom-in;
+    }
+    .card:nth-child(3n){transform:rotate(-.4deg) translateY(2px)}
+    .card:nth-child(4n){transform:rotate(.35deg)}
+    .card:nth-child(5n){transform:rotate(-.2deg)}
+    .card img{transform:scale(1);transition:transform .35s ease}
+    /* Smooth, slightly-larger hover zoom (< 2x) */
+    .card:hover img, .card:focus-visible img{transform:scale(1.28)}
+    .card:active img{transform:scale(1.22)}
+    .card:hover{z-index:3;box-shadow:0 18px 45px rgba(212,175,55,.18)}
+    @media (prefers-reduced-motion: reduce){ .card img{ transition: none; } }
+
+    /* ====== Contact ====== */
+    form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    form .full{grid-column:1/-1}
+    @media (max-width: 720px){form{grid-template-columns:1fr}}
+    .field{display:flex;flex-direction:column;gap:6px}
+    label{font-size:12px;color:var(--muted)}
+    input,select,textarea{
+      background:var(--ink);color:var(--text);border:1px solid rgba(212,175,55,.18);
+      border-radius:12px;padding:12px 14px
+    }
+    input:focus,select:focus,textarea:focus{outline:none;box-shadow:var(--ring);border-color:rgba(212,175,55,.45)}
+    textarea{min-height:120px}
+    .error{color:#ffb0b0;font-size:12px;min-height:16px}
+    .submit-row{display:flex;gap:12px;align-items:center}
+    .note{font-size:12px;color:var(--muted)}
+    [hidden]{display:none !important}
+    .thankyou{text-align:center;padding:24px 12px}
+    select.is-invalid{ border-color:#ff8b8b; box-shadow:0 0 0 3px rgba(255,139,139,.2); }
+
+    /* helper rows */
+    .date-row{display:flex;gap:8px}
+    .date-row select{flex:1}
+    .time-row{display:flex;gap:8px}
+    .time-row input{flex:2}
+    .time-row select{flex:1}
+
+    /* ====== Footer ====== */
+    footer{padding:30px 0;text-align:center;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <!-- ====== Header ====== -->
+  <header>
+    <div class="container nav" role="navigation" aria-label="Primary">
+      <div class="brand">
+        <!-- <img class="brand-logo" src="logo.png" alt="LCA Visual Studios Logo" /> -->
+        <div> 
+          <div class="brand-title">LCA Visual Studios</div>
+          <div class="brand-sub">by <span id="ownerName">Hemanth</span></div>
+        </div>
+      </div>
+
+      <!-- Desktop menu (no Home) -->
+      <nav class="menu" aria-label="Main menu">
+        <a href="#about">About</a>
+        <a href="#work">My Work</a>
+        <a href="#contact">Contact Me</a>
+      </nav>
+
+      <!-- Hamburger for small screens -->
+      <button class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu" id="hamburger">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    
+    <!-- Collapsible panel on small screens -->
+    <div class="mobile-panel" id="mobilePanel" hidden>
+      <nav class="mobile-menu container" id="mobileMenu">
+        <a href="#about" class="m-link">About</a>
+        <a href="#work" class="m-link">My Work</a>
+        <a href="#contact" class="m-link">Contact Me</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ====== Hero ====== -->
+  <main class="hero">
+    <div class="container hero-wrap">
+      <div class="hero-card">
+        <span class="hero-badge">Open for Booking</span>
+        <h1 class="hero-title">Lights Camera Action Visual Studios</h1>
+        <p class="tagline"> _ Capturing love, life & timeless moments</p>
+        <div class="cta">
+          <a class="btn" href="#contact">Enquiry</a>
+          <a class="btn outline" href="#work">View Work</a>
+        </div>
+      </div>
+      
+
+      <div class="hero-visual" aria-hidden="true">
+        <img src="logo.png" alt="LCA Visual Studios Logo" />
+        <div class="glide">Lights • Camera • Action</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ====== About ====== -->
+  <section id="about" class="about-section">
+    <div class="container">
+      <h2>About</h2>
+      <div class="about-desc">
+        <p>Hi, I'm <strong>Hemanth</strong> — a lifestyle and event photographer specializing in <em>Pre-wedding</em>, <em>Baby Shower</em>, <em>Gender Reveal</em>, <em>Portraits</em> and more.</p>
+        <p>Photography has always been my passion; I fell in love with the craft long before I owned my first camera — chasing light through windows, noticing tiny details others might miss. Over the years that curiosity became <strong>LCA – Lights Camera Action</strong>: a promise to tell stories that feel true to you. I started shooting friends and family events, learning how moments unfold when people forget about the camera.</p>
+        <p>Today I specialize in lifestyle, cultural and family celebrations — from <em>Pre-Wedding</em> warmth to <em>Housewarming</em> joy. My style blends candid emotion with clean, editorial frames so every gallery reads like a chapter from your life.</p>
+      </div>
+  
+      <div class="about-grid">
+        <div class="about-card skew-left">
+          <h3>What I Do</h3>
+          <ul class="bullets">
+            <li>Pre-Wedding & Couple Sessions</li>
+            <li>Baby Shower, Gender Reveal & Family Events</li>
+            <li>Housewarming, Parties & Cultural Ceremonies</li>
+            <li>Portraits & Model Shoots</li>
+            <li>On-location lifestyle stories</li>
+          </ul>
+        </div>
+        <div class="about-card skew-right">
+          <h3>How I Work</h3>
+          <ul class="bullets steps">
+            <li><span>01</span> Quick style chat to align on mood, outfits & locations</li>
+            <li><span>02</span> Light guidance on the day so you stay natural</li>
+            <li><span>03</span> True-to-tone edits that feel timeless</li>
+            <li><span>04</span> Sneak peeks within 48 hours</li>
+            <li><span>05</span> Full gallery in 1–2 weeks via private link</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== My Work ====== -->
+  <section id="work">
+    <div class="container">
+      <h2>My Work</h2>
+
+      <!-- Rows (no text on images, no arrows) -->
+      <div class="category" data-title="Pre-Wedding"><div class="cat-head"><div class="cat-title">Pre-Wedding & Couple Shoots</div></div><div class="rail"></div></div>
+      <div class="category" data-title="Wedding"><div class="cat-head"><div class="cat-title">Wedding</div></div><div class="rail"></div></div>
+      <div class="category" data-title="Baby"><div class="cat-head"><div class="cat-title">Baby Shower & Gender Reveal</div></div><div class="rail"></div></div>
+      <div class="category" data-title="Model"><div class="cat-head"><div class="cat-title">Model & Portrait Shoots</div></div><div class="rail"></div></div>
+      <div class="category" data-title="OtherCaptures"><div class="cat-head"><div class="cat-title">Other Captures</div></div><div class="rail"></div></div>
+
+      <template id="photoCard">
+        <div class="card" tabindex="0"><img alt="" src=""/></div>
+      </template>
+      
+    </div>
+  </section>
+
+  <!-- ====== Contact ====== -->
+  <section id="contact">
+    <div class="container">
+      <h2>Contact</h2>
+      <p class="sub">Fill out this form and I’ll call you at the earliest possible time. Tell me what you’re celebrating — I’ll handle the lighting, timing, and direction so you can simply enjoy the day.</p>
+
+      <form id="contactForm" class="form" novalidate>
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" required placeholder="Your full name" />
+          <div class="error" id="err-name"></div>
+        </div>
+
+        <div class="field">
+          <label for="eventType">Event Type</label>
+          <select id="eventType" name="eventType" required>
+            <option value="" disabled selected>Select an event</option>
+            <option>Pre-Wedding</option>
+            <option>Wedding</option>
+            <option>Gender Reveal</option>
+            <option>Baby Shower</option>
+            <option>House Warming</option>
+            <option>Portraits</option>
+            <option>Model Shoot</option>
+            <option>Parties & other Events</option>
+          </select>
+          <div class="error" id="err-eventType"></div>
+        </div>
+
+        <div class="field">
+          <label for="phone">Contact Number</label>
+          <input id="phone" name="phone" type="tel" inputmode="numeric" pattern="\d{10}" maxlength="10" required placeholder="Enter 10-digit number" />
+          <div class="error" id="err-phone"></div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email ID</label>
+          <input id="email" name="email" type="email" required placeholder="you@example.com" />
+          <div class="error" id="err-email"></div>
+        </div>
+
+        <div class="field">
+          <label for="city">Shoot Location</label>
+          <select id="city" name="city" required>
+            <option value="" disabled selected>Select a city</option>
+          </select>
+          <div class="error" id="err-city"></div>
+        </div>
+
+        <div class="field">
+          <label for="dateMonth">Shoot Date (mm/dd/yyyy)</label>
+          <div class="date-row">
+            <select id="dateMonth" name="dateMonth" required aria-label="Month"></select>
+            <select id="dateDay" name="dateDay" required aria-label="Day"></select>
+            <select id="dateYear" name="dateYear" required aria-label="Year"></select>
+          </div>
+          <input type="hidden" id="date" name="date" />
+          <div class="error" id="err-date"></div>
+        </div>
+
+        <div class="field">
+          <label for="time">Preferred Shoot Time</label>
+          <div class="time-row">
+            <input id="time" name="time" type="text" inputmode="numeric" required placeholder="03:45" pattern="^(0[1-9]|1[0-2]):[0-5][0-9]$" maxlength="5" />
+            <select id="ampm" name="ampm" required>
+              <option>AM</option>
+              <option>PM</option>
+            </select>
+          </div>
+          <div class="error" id="err-time"></div>
+        </div>
+
+        <div class="field">
+          <label for="duration">Shoot Duration</label>
+          <select id="duration" name="duration" required>
+            <option value="" disabled selected>Select hours</option>
+          </select>
+          <div class="error" id="err-duration"></div>
+        </div>
+
+        <div class="field full">
+          <label for="req">Requirements</label>
+          <textarea id="req" name="req" placeholder="Tell me the vibe, theme, must-have shots, key people/rituals and any other enquiries."></textarea>
+          <div class="error" id="err-req"></div>
+        </div>
+
+        <div class="full submit-row">
+          <button type="submit" class="btn">Send Request</button>
+          <span class="note" id="formNote" role="status" aria-live="polite"></span>
+        </div>
+      </form>
+      <div id="thankyou" class="thankyou" hidden>
+        <h3>Thank you!</h3>
+        <p>Your request has been received. I’ll get back to you shortly.</p>
+        <p><a class="btn outline" href="#work">See my work</a></p>
+      </div>
+      
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">© <span id="year"></span> LCA – Lights Camera Action. All rights reserved • <a href="https://www.instagram.com/lca.visualstudios/" target="_blank" rel="noopener">@lca.visualstudios</a></div>
+  </footer>
+
+  <!-- ====== Script ====== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+  <script>
+    // ====== Helpers ======
+    function pad(n){ return String(n).padStart(2,'0'); }
+    function nowInChicago(){
+      const fmt = new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false});
+      const parts = Object.fromEntries(fmt.formatToParts(new Date()).map(p=>[p.type,p.value]));
+      return { year:+parts.year, month:+parts.month, day:+parts.day, hour:+parts.hour, minute:+parts.minute };
+    }
+
+    // ====== Responsive Menu ======
+    const hamburger = document.getElementById('hamburger');
+    const panel = document.getElementById('mobilePanel');
+    const mobileLinks = document.querySelectorAll('.m-link');
+
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbx4mpD20ktWBdRTEjlotq37B2wvYRg2ucFVMJ00d2g8Bp3nYM5Xr1GTUTn-NLMMTmpS/exec";
+    const GAS_KEY = "512b826693254e19986e4ce82e24b9d5fb2382a4d22045539edd8f4261ccf119";
+
+    // ====== EMAIL: Google Apps Script endpoint ======
+    const FORM_ENDPOINT = ""; // Add your Formspree endpoint if you want direct server email
+    hamburger?.addEventListener('click', ()=>{
+      const expanded = hamburger.getAttribute('aria-expanded') === 'true';
+      hamburger.setAttribute('aria-expanded', String(!expanded));
+      panel.hidden = expanded;
+    });
+    mobileLinks.forEach(a=>a.addEventListener('click', ()=>{ panel.hidden = true; hamburger.setAttribute('aria-expanded','false'); }));
+
+// === Supabase for gallery ===
+const SUPABASE_URL  = "https://yegamjocxnwredeuczco.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllZ2Ftam9jeG53cmVkZXVjemNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MzY2NDksImV4cCI6MjA3MDUxMjY0OX0.TdCrtMVEM59bIdsl_yitC6oPyo-YVFRtfACLUMNDAik";
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const BUCKET = "portfolio";
+
+
+
+    // ====== My Work: populate ======
+// ====== My Work: populate from Supabase ======
+const folderMap = {
+  "Pre-Wedding": "prewedding",
+  "Wedding": "wedding",
+  "Baby": "baby",
+  "Model": "model",
+  "OtherCaptures": "other"
+};
+
+function publicUrl(path){
+  return supa.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+
+async function listFolder(folder){
+  const { data, error } = await supa.storage.from(BUCKET).list(folder, {
+    limit: 200,
+    sortBy: { column: "name", order: "asc" }
+  });
+  if (error) { console.error(error); return []; }
+  return (data || []).map(f => ({ name: f.name, path: `${folder}/${f.name}` }));
+}
+
+function isVideo(name){
+  return /\.(mp4|mov|webm|m4v)$/i.test(name);
+}
+
+async function populateGalleries(){
+  const tpl = document.getElementById('photoCard');
+  const cats = document.querySelectorAll('.category');
+
+  for (const cat of cats){
+    const title = cat.getAttribute('data-title');
+    const folder = folderMap[title] || "other";
+    const rail = cat.querySelector('.rail');
+    rail.innerHTML = ""; // clear
+
+    const files = await listFolder(folder);
+    for (const f of files){
+      const card = tpl.content.firstElementChild.cloneNode(true);
+      const url = publicUrl(f.path);
+
+      if (isVideo(f.name)) {
+        const vid = document.createElement('video');
+        vid.src = url; vid.controls = true; vid.muted = true;
+        vid.style.width = '100%'; vid.style.height = '100%';
+        vid.style.objectFit = 'cover'; vid.style.borderRadius = '14px';
+        card.innerHTML = ""; // wipe img
+        card.appendChild(vid);
+      } else {
+        card.querySelector('img').src = url;
+        card.querySelector('img').alt = f.name;
+      }
+      rail.appendChild(card);
+    }
+
+    // If the row is short, clone items so the motion feels continuous (your old behavior)
+    const minWidth = rail.clientWidth * 2.2;
+    let w = Array.from(rail.children).reduce((s,el)=>s+el.getBoundingClientRect().width+16,0);
+    while(w < minWidth && rail.children.length){
+      rail.append(...Array.from(rail.children).map(n=>n.cloneNode(true)));
+      w = Array.from(rail.children).reduce((s,el)=>s+el.getBoundingClientRect().width+16,0);
+    }
+  }
+
+  // re-bind the gentle bounce scroller
+  document.querySelectorAll('.rail').forEach(rail=>{
+    let dir = 1, last, raf;
+    const pxPerMs = 0.1;
+    const step = (ts)=>{
+      if(last==null) last=ts;
+      const dt=ts-last; last=ts;
+      rail.scrollLeft += dir * pxPerMs * dt;
+      if(rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 1){ dir = -1; }
+      if(rail.scrollLeft <= 0){ dir = 1; }
+      raf = requestAnimationFrame(step);
+    };
+    const start=()=>{ if(!raf) raf=requestAnimationFrame(step); };
+    const stop =()=>{ cancelAnimationFrame(raf); raf=null; };
+    start(); rail.addEventListener('mouseenter', stop); rail.addEventListener('mouseleave', start);
+    rail.addEventListener('touchstart', stop, {passive:true}); rail.addEventListener('touchend', start, {passive:true});
+  });
+}
+
+populateGalleries();
+
+
+    /*
+    const imageBank = {
+      "Pre-Wedding": [
+        "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1522336572468-97b06e8ef143?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1519744346363-564ff039b494?q=80&w=1200&auto=format&fit=crop"
+      ],
+      "Wedding": [
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1522336572468-97b06e8ef143?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1200&auto=format&fit=crop"
+      ],
+      "Baby": [
+        "https://images.unsplash.com/photo-1504198266285-165a55a3c229?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1519744346363-564ff039b494?q=80&w=1200&auto=format&fit=crop"
+      ],
+      "Model": [
+        "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1520975922323-0baf7b0b7b23?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop"
+      ],
+      "OtherCaptures": [
+        "https://images.unsplash.com/photo-1519744346363-564ff039b494?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1504198266285-165a55a3c229?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop"
+      ]
+    };
+
+    document.querySelectorAll('.category').forEach(cat=>{
+      const title = cat.getAttribute('data-title');
+      const rail = cat.querySelector('.rail');
+      const tpl = document.getElementById('photoCard');
+      (imageBank[title]||[]).forEach(src=>{
+        const card = tpl.content.firstElementChild.cloneNode(true);
+        card.querySelector('img').src = src;
+        rail.appendChild(card);
+      });
+
+      // If the row is short, clone items so the motion feels continuous
+      const minWidth = rail.clientWidth * 2.2;
+      let w = Array.from(rail.children).reduce((s,el)=>s+el.getBoundingClientRect().width+16,0);
+      while(w < minWidth){
+        rail.append(...Array.from(rail.children).map(n=>n.cloneNode(true)));
+        w = Array.from(rail.children).reduce((s,el)=>s+el.getBoundingClientRect().width+16,0);
+      }
+    });
+
+    // ====== Bounce left <-> right (no arrows) ======
+    document.querySelectorAll('.rail').forEach(rail=>{
+      let dir = 1; // 1 right, -1 left
+      const pxPerMs = 0.1;
+      let last; let raf;
+      const step = (ts)=>{
+        if(last==null) last=ts;
+        const dt = ts-last; last=ts;
+        rail.scrollLeft += dir * pxPerMs * dt;
+        if(rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 1){ dir = -1; }
+        if(rail.scrollLeft <= 0){ dir = 1; }
+        raf = requestAnimationFrame(step);
+      };
+      const start=()=>{ if(!raf) raf=requestAnimationFrame(step); };
+      const stop =()=>{ cancelAnimationFrame(raf); raf=null; };
+      start(); rail.addEventListener('mouseenter', stop); rail.addEventListener('mouseleave', start);
+      rail.addEventListener('touchstart', stop, {passive:true}); rail.addEventListener('touchend', start, {passive:true});
+    });
+
+    */
+
+    // ====== Contact form logic & validation ======
+    const form = document.getElementById('contactForm');
+    const note = document.getElementById('formNote');
+
+    // Cities across Texas
+    const texasCities = ["Houston","San Antonio","Dallas","Austin","Fort Worth","El Paso","Arlington","Corpus Christi","Plano","Laredo","Lubbock","Garland","Irving","Amarillo","Grand Prairie","Brownsville","McKinney","Frisco","Pasadena","Killeen","McAllen","Mesquite","Midland","Waco","Carrollton","Denton","Abilene","Beaumont","Round Rock","Odessa","Richardson","Lewisville","Tyler","College Station","Pearland","San Angelo","Allen","League City","Sugar Land","Longview","Edinburg","Mission","Bryan","Baytown","Pharr","Temple","Missouri City","Flower Mound","North Richland Hills","Harlingen","Victoria","Conroe","New Braunfels","Mansfield","Cedar Park","Rowlett","Port Arthur","Euless","Pflugerville","Georgetown","San Marcos","DeSoto","Grapevine","Wichita Falls","Sherman","Denison","Keller","Burleson","Hurst","Cleburne","Waxahachie","Weatherford","Coppell","Wylie","Rockwall","Little Elm","The Woodlands","Spring","Katy","Cypress","Humble","Tomball","Galveston","Texas City","La Marque","Friendswood","Bay City","Angleton","Freeport","Rosenberg","Richmond","Stafford","Lake Jackson","Brenham","Huntsville","Nacogdoches","Lufkin","Palestine","Paris","Greenville","Terrell","Forney","Seguin","Schertz","Kyle","Leander","Bastrop","Boerne","Kerrville","Fredericksburg","Marble Falls","Lampasas","Copperas Cove","Harker Heights","Kingsville","Alice","Weslaco","Donna","Mercedes","San Juan","Alamo","Edna","Rockport","Port Aransas","Port Lavaca","Eagle Pass","Del Rio","Uvalde","Rio Grande City","Roma","Brownwood","Stephenville","Mineral Wells","Kilgore","Mount Pleasant","Sulphur Springs","Texarkana","Belton","Elgin","Taylor","Temple"];
+    const citySelect = document.getElementById('city');
+    function populateCities(){
+      citySelect.innerHTML = '<option value="" disabled selected>Select a city</option>' + texasCities.sort().map(c=>`<option>${c}</option>`).join('');
+    }
+    populateCities();
+
+    // Duration options 1..15 hours
+    const duration = document.getElementById('duration');
+    for(let i=1;i<=15;i++){ const o=document.createElement('option'); o.value=i; o.textContent=`${i} hour${i>1?'s':''}`; duration.appendChild(o); }
+
+    // Build mm/dd/yyyy dropdowns; keep a hidden ISO input named #date
+    const dateHidden = document.getElementById('date');
+    const mSel = document.getElementById('dateMonth');
+    const dSel = document.getElementById('dateDay');
+    const ySel = document.getElementById('dateYear');
+    function daysInMonth(y,m){ return new Date(y, m, 0).getDate(); }
+    function fillMonths(){
+      mSel.innerHTML = '<option value="" disabled selected>MM</option>';
+      for (let m = 1; m <= 12; m++){ const o = document.createElement('option'); const v = pad(m); o.value = v; o.textContent = v; mSel.appendChild(o); }
+    }
+    function fillYears(){
+      const start = 2025, end = 2035;
+      ySel.innerHTML = '<option value="" disabled selected>YYYY</option>';
+      for (let y = start; y <= end; y++){ const o=document.createElement('option'); o.value=String(y); o.textContent=String(y); ySel.appendChild(o); }
+    }
+    function fillDays(){
+      const cur = dSel.value;
+      dSel.innerHTML = '<option value="" disabled selected>DD</option>';
+      if (!ySel.value || !mSel.value) return;
+      const max = daysInMonth(parseInt(ySel.value, 10), parseInt(mSel.value, 10));
+      for (let d = 1; d <= max; d++){ const o=document.createElement('option'); const v=pad(d); o.value=v; o.textContent=v; dSel.appendChild(o); }
+      if (cur && parseInt(cur,10) <= max) dSel.value = cur;
+    }
+    fillMonths(); fillYears(); fillDays();
+
+    function syncHidden(){ if(mSel.value && dSel.value && ySel.value){ dateHidden.value = `${ySel.value}-${mSel.value}-${dSel.value}`; } else { dateHidden.value=''; } }
+
+    // live date validation for past dates
+    function validateDateLive(){
+      if (!(mSel.value && dSel.value && ySel.value)) {
+        showError('err-date',''); [mSel,dSel,ySel].forEach(s=>s.classList.remove('is-invalid')); dateHidden.value = ''; return;
+      }
+      const iso = `${ySel.value}-${mSel.value}-${dSel.value}`;
+      const n = nowInChicago();
+      const today = `${n.year}-${pad(n.month)}-${pad(n.day)}`;
+      if (iso < today) { showError('err-date','Past dates are not available.'); [mSel,dSel,ySel].forEach(s=>s.classList.add('is-invalid')); }
+      else { showError('err-date',''); [mSel,dSel,ySel].forEach(s=>s.classList.remove('is-invalid')); }
+      dateHidden.value = iso;
+    }
+    validateDateLive();
+    [mSel,ySel,dSel].forEach(el=>el.addEventListener('change', ()=>{ fillDays(); syncHidden(); validateDateLive(); }));
+
+    // Time: numeric only; auto-format hh:mm (12h)
+    const timeEl = document.getElementById('time');
+    timeEl.addEventListener('input', (e)=>{
+      let digits = e.target.value.replace(/\D/g,'').slice(0,4);
+      if (digits.length <= 2){
+        if (digits.length === 1 && +digits > 1) digits = '0'+digits;
+        if (digits.length === 2){ let h = Math.min(Math.max(parseInt(digits,10)||1,1),12); digits = String(h).padStart(2,'0'); }
+        e.target.value = digits; return;
+      }
+      let hh = Math.min(Math.max(parseInt(digits.slice(0,2),10)||1,1),12);
+      let mm = Math.min(Math.max(parseInt(digits.slice(2,4),10)||0,0),59);
+      e.target.value = String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+    });
+    timeEl.addEventListener('blur',(e)=>{ const v=e.target.value; if(/^[0-9]{1,2}$/.test(v)) e.target.value = String(Math.min(Math.max(+v||1,1),12)).padStart(2,'0')+':00'; });
+
+    // Phone: digits only, cap at 10
+    const phoneEl = document.getElementById('phone');
+    phoneEl.addEventListener('input', (e)=>{ e.target.value = e.target.value.replace(/\D/g,'').slice(0,10); });
+    phoneEl.addEventListener('blur', (e)=>{ const v=e.target.value.replace(/\D/g,''); if(v.length !== 10) showError('err-phone','Enter a 10-digit number.'); else showError('err-phone',''); });
+
+    // helpers
+    function onlyDigits(str){ return (str||'').replace(/\D+/g,''); }
+    function showError(id,msg){ const el=document.getElementById(id); if(el){ el.textContent = msg || ''; } }
+    function clearErrors(){ ['name','eventType','phone','email','city','date','time','duration','req'].forEach(k=>showError('err-'+k,'')); }
+
+    function validate(){
+      clearErrors();
+      const data = Object.fromEntries(new FormData(form));
+      let ok = true;
+
+      if(!data.name?.trim()){ showError('err-name','Please enter your name.'); ok=false; }
+      if(!data.eventType){ showError('err-eventType','Select your event/occasion type.'); ok=false; }
+
+      const phoneDigits = onlyDigits(data.phone);
+      if(phoneDigits.length !== 10){ showError('err-phone','Enter a 10-digit number.'); ok=false; }
+
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((data.email||'').trim());
+      if(!emailOk){ showError('err-email','Enter a valid email address.'); ok=false; }
+
+      if(!data.city){ showError('err-city','Choose a city.'); ok=false; }
+
+      if(!dateHidden.value){ showError('err-date','Pick your event date.'); ok=false; }
+      else {
+        const n = nowInChicago();
+        const today = `${n.year}-${pad(n.month)}-${pad(n.day)}`;
+        if(dateHidden.value < today){ showError('err-date','Select a valid date.'); ok=false; }
+      }
+
+      const timeOk = /^(0[1-9]|1[0-2]):[0-5][0-9]$/.test(data.time);
+      if(!timeOk){ showError('err-time','Enter event start time.'); ok=false; }
+      else {
+        const n = nowInChicago();
+        const today = `${n.year}-${pad(n.month)}-${pad(n.day)}`;
+        if(dateHidden.value === today){
+          const [hh,mm] = data.time.split(':').map(Number);
+          let h = hh % 12; if((data.ampm||'AM').toUpperCase()==='PM') h+=12;
+          const mins = h*60 + mm; const nowMins = n.hour*60 + n.minute;
+          if(mins < nowMins){ showError('err-time','Please pick a time.'); ok=false; }
+        }
+      }
+
+      if(!data.duration){ showError('err-duration','Select duration'); ok=false; }
+      return ok;
+    }
+
+    async function sendViaAppsScript(data){
+      const payload = {
+        key: GAS_KEY,                               // required by your Apps Script
+        name: data.name,
+        eventType: data.eventType,
+        phone: data.phone,
+        email: data.email,
+        city: data.city,
+        date: document.getElementById('date').value,
+        time: `${data.time} ${data.ampm}`,
+        duration: data.duration,
+        req: data.req || ''
+      };
+
+      const res = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json().catch(()=>({}));
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || 'request_failed');
+      }
+    }
+
+
+
+/*
+    // Submission: Formspree (if set) else mailto; then show Thank You only
+    const EMAIL_TO = 'gaswiniajay@gmail.com';
+    form?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      if(!validate()){ note.textContent = 'Please fill all the details and try again.'; return; }
+      const data = Object.fromEntries(new FormData(form));
+      note.textContent = 'Sending…';
+
+      try{
+        await sendViaAppsScript(data);
+        note.textContent = '';
+      }catch(err){
+        const subject = encodeURIComponent(`LCA Booking • ${data.eventType} • ${data.name}`);
+        const body = encodeURIComponent(
+`Name: ${data.name}
+Event: ${data.eventType}
+Phone: ${data.phone}
+Email: ${data.email}
+City: ${data.city}
+Date: ${dateHidden.value}
+Preferred Time: ${data.time} ${data.ampm}
+Duration: ${data.duration} hour(s)
+
+Requirement:
+${data.req || ''}`);
+        window.location.href = `mailto:${EMAIL_TO}?subject=${subject}&body=${body}`;
+      } */
+
+
+          form?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      if(!validate()){ note.textContent = 'Please fill all the details and try again.'; return; }
+
+      const data = Object.fromEntries(new FormData(form));
+      note.textContent = 'Sending…';
+
+      try{
+        await sendViaAppsScript(data);
+        note.textContent = '';
+      }catch(err){
+        console.error(err);
+        note.textContent = 'Could not send. Please try again or email me directly.';
+        return; // stop if send failed
+      }
+
+      // Hide form, show thanks
+      const contactH2  = document.querySelector('#contact h2');
+      const contactSub = document.querySelector('#contact .sub');
+      const thanks     = document.getElementById('thankyou');
+      if (contactH2)  contactH2.hidden  = true;
+      if (contactSub) contactSub.hidden = true;
+      form.hidden = true;
+      thanks.hidden = false;
+      note.textContent = '';
+      thanks.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // Misc content fill
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+  </script>
+
+
+
+
+</body>
+</html>

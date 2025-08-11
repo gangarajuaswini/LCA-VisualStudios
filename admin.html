@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LCA – Admin Upload</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body{font-family:system-ui,Segoe UI,Arial;margin:24px;background:#0a0a0a;color:#f7f5ee}
+    .card{background:#111;padding:16px;border-radius:12px;margin-bottom:16px;border:1px solid #333}
+    input,select,button{padding:10px;border-radius:10px;border:1px solid #333;background:#141416;color:#f7f5ee}
+    button{cursor:pointer;font-weight:700}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:12px}
+    .item{background:#0f0f13;border:1px solid #333;padding:8px;border-radius:12px}
+    .thumb{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px}
+    .muted{opacity:.7;font-size:12px}
+  </style>
+</head>
+<body>
+  <h1>LCA – Admin</h1>
+
+  <div id="auth" class="card">
+    <h3>Sign in</h3>
+    <div class="row">
+      <input id="email" type="email" placeholder="email" autocomplete="username">
+      <input id="password" type="password" placeholder="password" autocomplete="current-password">
+      <button id="signin">Sign in</button>
+      <button id="signout" hidden>Sign out</button>
+    </div>
+    <p class="muted">Only the photographer’s Supabase account can sign in. (New signups should be disabled in Supabase.)</p>
+    <div id="authNote" class="muted"></div>
+  </div>
+
+  <div id="app" class="card" hidden>
+    <h3>Upload photos / videos</h3>
+    <div class="row">
+      <select id="folder">
+        <option value="prewedding">Pre-Wedding</option>
+        <option value="wedding">Wedding</option>
+        <option value="baby">Baby</option>
+        <option value="model">Model</option>
+        <option value="other">Other</option>
+      </select>
+      <input id="files" type="file" multiple accept="image/*,video/*">
+      <button id="upload">Upload</button>
+    </div>
+    <div id="upNote" class="muted"></div>
+
+    <h3 style="margin-top:18px">Current files</h3>
+    <div class="row">
+      <button id="refresh">Refresh list</button>
+    </div>
+    <div id="list" class="grid"></div>
+  </div>
+
+<script>
+const SUPABASE_URL  = "https://yegamjocxnwredeuczco.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllZ2Ftam9jeG53cmVkZXVjemNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MzY2NDksImV4cCI6MjA3MDUxMjY0OX0.TdCrtMVEM59bIdsl_yitC6oPyo-YVFRtfACLUMNDAik";
+const BUCKET = "portfolio";
+
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+const el = (id)=>document.getElementById(id);
+const note = (id,msg)=>{ el(id).textContent = msg||""; };
+
+async function checkSession(){
+  const { data:{ session } } = await client.auth.getSession();
+  el("app").hidden = !session;
+  el("signout").hidden = !session;
+  el("signin").hidden = !!session;
+  if (session) { loadList(); }
+}
+el("signin").onclick = async ()=>{
+  note("authNote","Signing in…");
+  const email = el("email").value.trim();
+  const password = el("password").value;
+  const { error } = await client.auth.signInWithPassword({ email, password });
+  if (error){ note("authNote", "Sign in failed: "+error.message); }
+  else { note("authNote",""); }
+  checkSession();
+};
+el("signout").onclick = async ()=>{
+  await client.auth.signOut();
+  checkSession();
+};
+
+async function loadList(){
+  el("list").innerHTML = "";
+  const folder = el("folder").value;
+  const { data, error } = await client.storage.from(BUCKET).list(folder, { limit: 100, sortBy:{ column:"name", order:"asc" }});
+  if (error){ note("upNote","Could not list files: "+error.message); return; }
+  if (!data || !data.length){ el("list").innerHTML = '<div class="muted">No files yet.</div>'; return; }
+  for (const f of data){
+    const path = `${folder}/${f.name}`;
+    const url  = client.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+
+    const div = document.createElement("div");
+    div.className = "item";
+    const isVid = /\.(mp4|mov|webm|m4v)$/i.test(f.name);
+    div.innerHTML = `
+      <div>${f.name}</div>
+      ${isVid
+        ? `<video class="thumb" src="${url}" controls></video>`
+        : `<img class="thumb" src="${url}" alt="">`
+      }
+      <div class="row" style="margin-top:8px">
+        <button data-path="${path}" class="del">Delete</button>
+        <a href="${url}" target="_blank"><button type="button">Open</button></a>
+      </div>
+    `;
+    el("list").appendChild(div);
+  }
+  // wire delete buttons
+  el("list").querySelectorAll(".del").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      if (!confirm("Delete this file?")) return;
+      const p = btn.getAttribute("data-path");
+      const { error } = await client.storage.from(BUCKET).remove([p]);
+      if (error){ alert("Delete failed: "+error.message); }
+      else { loadList(); }
+    });
+  });
+}
+
+el("refresh").onclick = loadList;
+el("folder").onchange = loadList;
+
+el("upload").onclick = async ()=>{
+  const files = el("files").files;
+  const folder = el("folder").value;
+  if (!files || !files.length){ note("upNote","Choose files first."); return; }
+  note("upNote","Uploading…");
+  for (const file of files){
+    const safeName = `${Date.now()}-${file.name.replace(/\s+/g,"_")}`;
+    const path = `${folder}/${safeName}`;
+    const { error } = await client.storage.from(BUCKET).upload(path, file, { upsert:false });
+    if (error){ note("upNote","Error: "+error.message); return; }
+  }
+  note("upNote","Done!");
+  el("files").value = "";
+  loadList();
+};
+
+checkSession();
+</script>
+</body>
+</html>
